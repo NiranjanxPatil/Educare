@@ -30,7 +30,7 @@ with col2:
     # Create a placeholder to store the chat-like responses
     chat_history = st.empty()
 
-genai.configure(api_key="AIzaSyC6_7-hxVqljm-FD8-J6DCPRZsrQO7SzJM")
+genai.configure(api_key="")
 model = genai.GenerativeModel('gemini-1.5-flash')
 
 # Initialize the webcam to capture video
