@@ -3,11 +3,11 @@ import google.generativeai as genai
 from PIL import Image
 
 # Configure Google Generative AI
-genai.configure(api_key="")
+genai.configure(api_key="AIzaSyByz2fCoMLCiLP1T8e2UFlnNG96s7RlzSE")
 model = genai.GenerativeModel("gemini-1.5-flash")
 
 # Streamlit UI setup
-st.set_page_config(page_title="AI Chatb0ot", layout="wide")
+st.set_page_config(page_title="AI Chatbot", layout="wide")
 st.title("🤖 AI Chatbot")
 st.write("Ask me anything, and I'll assist while considering the context!")
 
@@ -32,8 +32,8 @@ col1, col2 = st.columns([3, 1])
 with col1:
     st.subheader("Chat History")
     for chat in st.session_state["chat_history"]:
-        st.markdown(f"**You:** {chat['user_input']}")
-        st.markdown(f"**AI:** {chat['response']}")
+        st.markdown(f":bust_in_silhouette: **You:** {chat['user_input']}")
+        st.markdown(f":robot_face: **AI:** {chat['response']}")
 
     # Text input and send button
     st.subheader("Ask a Question")
