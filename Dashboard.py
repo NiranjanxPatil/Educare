@@ -55,6 +55,11 @@ def main_dashboard():
     st.subheader("📘 Your go-to platform for education and resources.")
     st.markdown("""
     EduCare is an online educational platform that brings together cutting-edge tech and learning resources.
+    - 🎯 Interactive Courses with real-world applications.
+    - 🧑‍🏫 Expert Instructors from top universities and industries.
+    - 📊 Data-driven Learning Paths to track progress.
+    - 🌍 Community Support & Webinars to stay updated.
+    - 🔥 Career Guidance and job interview preparation.
     """)
 
 def contact_us():
@@ -72,6 +77,13 @@ def about_us():
     st.title("ℹ️ About EduCare")
     st.markdown("""
     **Our Mission**: To create a platform that bridges the gap between traditional education and modern learning.
+    - 🏆 Award-winning educational platform trusted by thousands.
+    - 🤖 AI-powered Personalized Learning Experiences.
+    - 📚 Course materials from reputed universities & industry experts.
+    - 🌟 Recognized by major tech firms for skill development.
+    - 🎓 Partnerships with top institutions for certifications.
+    - 🚀 Hands-on projects to enhance learning.
+    - 📈 Career-oriented roadmap to help students excel.
     """)
 
 def course_list():
@@ -85,10 +97,15 @@ def source_code_tech():
     st.title("💻 Source Code & Tech")
     st.markdown("""
     ### Technologies Used:
-    - **Python**
-    - **Streamlit**
-    - **MongoDB**
-    - **Docker**
+    - **Python** 🐍: Core language for backend and ML tasks.
+    - **Streamlit** 🚀: Fast and interactive UI development.
+    - **MongoDB** 📂: NoSQL database for storing user data.
+    - **Docker** 🐳: Containerized deployments for scalability.
+    - **FastAPI** ⚡: Modern API framework for fast performance.
+    - **TensorFlow & PyTorch** 🧠: Machine learning model integrations.
+    - **AWS & GCP** ☁️: Cloud hosting and storage solutions.
+    - **PostgreSQL** 🗃️: Reliable relational database support.
+    - **Bootstrap & Tailwind CSS** 🎨: UI and responsive design frameworks.
     """)
 
 def course_stats():
