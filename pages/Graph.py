@@ -45,10 +45,24 @@ def plot_3d(equation, x_range, y_range):
     fig.update_layout(title="3D Surface Plot", scene=dict(xaxis_title="X", yaxis_title="Y", zaxis_title="Z"))
     return fig
 
+# Function to generate bar chart
+def plot_bar_chart(categories, values):
+    fig = go.Figure()
+    fig.add_trace(go.Bar(x=categories, y=values))
+    fig.update_layout(title="Bar Chart", xaxis_title="Categories", yaxis_title="Values")
+    return fig
+
+# Function to generate histogram
+def plot_histogram(values, bins):
+    fig = go.Figure()
+    fig.add_trace(go.Histogram(x=values, nbinsx=bins))
+    fig.update_layout(title="Histogram", xaxis_title="Values", yaxis_title="Frequency")
+    return fig
+
 # Streamlit UI
 st.title("Advanced Real-Time Graphing App 📈")
 
-graph_type = st.selectbox("Select Graph Type:", ["Cartesian", "Polar", "Parametric", "3D Surface"])
+graph_type = st.selectbox("Select Graph Type:", ["Cartesian", "Polar", "Parametric", "3D Surface", "Bar Chart", "Histogram"])
 
 if graph_type == "Cartesian":
     equation = st.text_input("Enter a function of x:", "np.sin(x)")
@@ -75,3 +89,15 @@ elif graph_type == "3D Surface":
     y_range = st.slider("Select Y-axis range:", -10, 10, (-5, 5))
     if st.button("Plot Graph"):
         st.plotly_chart(plot_3d(equation, x_range, y_range))
+
+elif graph_type == "Bar Chart":
+    categories = st.text_area("Enter categories (comma-separated):", "A,B,C,D").split(",")
+    values = list(map(float, st.text_area("Enter values (comma-separated):", "4,7,1,8").split(",")))
+    if st.button("Plot Graph"):
+        st.plotly_chart(plot_bar_chart(categories, values))
+
+elif graph_type == "Histogram":
+    values = list(map(float, st.text_area("Enter values (comma-separated):", "1,2,2,3,3,3,4,4,4,4,5,5,5,6").split(",")))
+    bins = st.slider("Select number of bins:", 1, 20, 10)
+    if st.button("Plot Graph"):
+        st.plotly_chart(plot_histogram(values, bins))

@@ -27,6 +27,12 @@ st.subheader("Math Solver")
 user_input = st.text_input("Enter a math equation or problem here:")
 
 
+def clean_manim_code(raw_code):
+    """Removes unnecessary prefix/suffix and formats the Manim script correctly."""
+    cleaned_code = raw_code.strip().replace("```python", "").replace("```", "").strip()
+    return cleaned_code
+
+
 def handle_error_and_retry(error_message, manim_code, attempt_count):
     """Send the error back to the API to fix and retry."""
     st.error(f"Manim error: {error_message}")
@@ -34,10 +40,10 @@ def handle_error_and_retry(error_message, manim_code, attempt_count):
         f"The following Manim script failed with an error:\n"
         f"{manim_code}\n"
         f"Error message:\n{error_message}\n"
-        f"Please fix the issue and return the corrected Manim script."
+        f"Please fix the issue and return only the corrected Manim script without any additional comments, explanations, or formatting markers."
     )
     response = model.generate_content([retry_prompt])
-    corrected_code = response.text.strip()
+    corrected_code = clean_manim_code(response.text)
 
     # Save corrected code to file
     with open("generate_solution.py", "w") as script_file:
@@ -66,20 +72,19 @@ if st.button("Solve"):
 if st.button("Generate Video"):
     if user_input:
         try:
-            # Request Python code for Manim animations with updated prompt
+            # Request Python code for Manim animations
             prompt = (
                 f"Create a Manim script that visualizes the solution for the following math problem: {user_input}.\n"
-                f"Use the following guidelines strictly:\n"
-                f"- All LaTeX equations must be wrapped in MathTex or Tex.\n"
-                f"- Start the script with `from manim import *` and define a class inheriting from Scene.\n"
-                f"- Ensure the script includes shapes, figures, and graphs where necessary.\n"
+                f"Ensure the script follows these guidelines strictly:\n"
+                f"- Use `MathTex` or `Tex` for LaTeX equations.\n"
+                f"- Start with `from manim import *` and define a class inheriting from `Scene`.\n"
+                f"- Include shapes, figures, and graphs where necessary.\n"
                 f"- Use different colors, backgrounds, animations, and effects to enhance creativity.\n"
                 f"- Add more movements and creative visuals to make the solution engaging.\n"
-                f"- Avoid including any prefix or suffix like ```python or ```.\n"
-                f"- Ensure the script is self-contained and does not include any additional comments or instructions.\n"
+                f"- Return only the Manim script without any explanations, comments, or formatting markers."
             )
             response = model.generate_content([prompt])
-            manim_code = response.text.strip()
+            manim_code = clean_manim_code(response.text)
 
             # Save Manim code to generate_solution.py
             with open("generate_solution.py", "w") as script_file:
@@ -87,22 +92,20 @@ if st.button("Generate Video"):
 
             retry_limit = 2
             attempts = 0
-            progress_bar = st.progress(0)  # Initialize progress bar
+            progress_bar = st.progress(0)
 
             while attempts < retry_limit:
-                st.write(f"Retry attempt: {attempts + 1}/{retry_limit}")  # Display retry counter
+                st.write(f"Retry attempt: {attempts + 1}/{retry_limit}")
                 try:
-                    # Update progress bar as the process starts
-                    progress_bar.progress(int((attempts + 1) * 50 / retry_limit))  # 50% at the first retry
+                    progress_bar.progress(int((attempts + 1) * 50 / retry_limit))
 
                     # Generate video using Manim
                     manim_command = ["manim", "-pql", "generate_solution.py"]
                     result = subprocess.run(manim_command, capture_output=True, text=True)
 
                     if result.returncode == 0:
-                        # Complete progress bar after success
                         progress_bar.progress(100)
-                        video_path = "media/videos/generate_solution/1080p60/Scene.mp4"  # Adjust as per Manim's output
+                        video_path = "media/videos/generate_solution/1080p60/Scene.mp4"
                         if os.path.exists(video_path):
                             st.video(video_path)
                             break
@@ -112,16 +115,12 @@ if st.button("Generate Video"):
                     else:
                         error_message = result.stderr
                         manim_code, attempts = handle_error_and_retry(error_message, manim_code, attempts)
-
                 except Exception as e:
                     error_message = str(e)
                     manim_code, attempts = handle_error_and_retry(error_message, manim_code, attempts)
-
-                # Update progress bar at each attempt
-                progress_bar.progress(int((attempts + 1) * 50 / retry_limit))  # 50% at the first retry
+                progress_bar.progress(int((attempts + 1) * 50 / retry_limit))
 
             if attempts == retry_limit:
                 st.error("Failed to generate video after 2 attempts.")
-
         except Exception as e:
             st.error(f"Error generating video: {e}")
