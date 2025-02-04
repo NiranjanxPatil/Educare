@@ -8,6 +8,8 @@ model = genai.GenerativeModel("gemini-1.5-flash")
 
 # Streamlit UI setup
 st.set_page_config(page_title="AI Chatbot", layout="wide")
+st.image('tutorai.png')
+
 st.title("🤖 AI Chatbot")
 st.write("Ask me anything, and I'll assist while considering the context!")
 

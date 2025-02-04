@@ -8,6 +8,8 @@ genai.configure(api_key="AIzaSyBLB6LyhnXP-dtGY1dcOVf26p1DVptYJKM")
 model = genai.GenerativeModel("gemini-1.5-flash")
 
 # Streamlit UI setup
+st.image('quicksolve.png')
+
 st.set_page_config(page_title="Math Solution and Video Generator", layout="wide")
 st.title("📚 Math Solution and Video Generator")
 st.write("Enter a math equation, solve it step by step, and generate a video explanation!")

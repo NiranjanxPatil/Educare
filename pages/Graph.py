@@ -60,6 +60,8 @@ def plot_histogram(values, bins):
     return fig
 
 # Streamlit UI
+st.image('graphplot.png')
+
 st.title("Advanced Real-Time Graphing App 📈")
 
 graph_type = st.selectbox("Select Graph Type:", ["Cartesian", "Polar", "Parametric", "3D Surface", "Bar Chart", "Histogram"])

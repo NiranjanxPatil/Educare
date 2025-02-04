@@ -7,7 +7,7 @@ from PIL import Image
 import streamlit as st
 
 st.set_page_config(layout="wide")
-st.image('MathGestures.png')
+st.image('airsolve.png')
 
 # Collapsible Instructions Section
 with st.expander("Instructions"):
