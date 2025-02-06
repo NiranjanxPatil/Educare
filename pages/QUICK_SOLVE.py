@@ -4,7 +4,7 @@ import subprocess
 import os
 
 # Configure Google Generative AI
-genai.configure(api_key="AIzaSyBLB6LyhnXP-dtGY1dcOVf26p1DVptYJKM")
+genai.configure(api_key="AIzaSyAv_Hozwv3jAycftamoGYb1Gc0rMl5_j4c")
 model = genai.GenerativeModel("gemini-1.5-flash")
 
 # Streamlit UI setup

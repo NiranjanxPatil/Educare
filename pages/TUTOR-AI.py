@@ -3,7 +3,7 @@ import google.generativeai as genai
 from PIL import Image
 
 # Configure Google Generative AI
-genai.configure(api_key="AIzaSyByz2fCoMLCiLP1T8e2UFlnNG96s7RlzSE")
+genai.configure(api_key="AIzaSyCjjFyXDIbnjOdOSLuj0W3trl3eCXdkQ6g")
 model = genai.GenerativeModel("gemini-1.5-flash")
 
 # Streamlit UI setup
