@@ -1,144 +1,141 @@
-import openai
 import streamlit as st
-import logging
-import json
-import requests
-from PIL import Image, ImageEnhance
-import base64
-import time
+import google.generativeai as genai
+from fpdf import FPDF
 
-# Configure logging
-logging.basicConfig(level=logging.INFO)
-
-# Constants
-NUMBER_OF_MESSAGES_TO_DISPLAY = 20
-API_DOCS_URL = "https://docs.streamlit.io/library/api-reference"
-
-# Retrieve and validate Gemini API key (assuming the key is stored in secrets.toml file)
-GEMINI_API_KEY = st.secrets.get("GEMINI_API_KEY", None)
-if not GEMINI_API_KEY:
-    st.error("Please add your Gemini API key to the Streamlit secrets.toml file.")
-    st.stop()
-
-# Assign Gemini API Key
-headers = {"Authorization": f"Bearer {GEMINI_API_KEY}"}
-
-# Streamlit Page Configuration
-st.set_page_config(
-    page_title="Math Solver AI Bot",
-    page_icon="imgs/avatar_math.png",  # Replace with your desired icon
-    layout="wide",
-)
-
-# Streamlit Title
-st.title("AI Math Solver")
+# Set up Gemini API Key
+genai.configure(api_key="AIzaSyByz2fCoMLCiLP1T8e2UFlnNG96s7RlzSE")
 
 
-def img_to_base64(image_path):
-    """Convert image to base64."""
-    try:
-        with open(image_path, "rb") as img_file:
-            return base64.b64encode(img_file.read()).decode()
-    except Exception as e:
-        logging.error(f"Error converting image to base64: {str(e)}")
-        return None
-
-
-@st.cache_data(show_spinner=False)
-def on_chat_submit(chat_input):
+def generate_practice_questions(topic, difficulty, num_questions):
     """
-    Handle chat input submissions and interact with the Gemini API for solving math sums.
-
-    Parameters:
-    - chat_input (str): The math sum input from the user.
-
-    Returns:
-    - None: Updates the chat history in Streamlit's session state.
+    Generate practice questions based on the selected topic, difficulty, and number of questions using the Gemini API.
     """
-    user_input = chat_input.strip().lower()
+    prompt = f"Generate {difficulty} level math practice questions on {topic}. Provide {num_questions} questions."
 
-    if 'conversation_history' not in st.session_state:
-        st.session_state.conversation_history = []
+    model = genai.GenerativeModel("gemini-pro")
+    response = model.generate_content(prompt)
 
-    st.session_state.conversation_history.append({"role": "user", "content": user_input})
-
-    try:
-        # API call to Gemini for solving math sum
-        response = requests.post(
-            "https://api.gemini.com/solve_math_sum",  # Replace with Gemini API endpoint for math sum solving
-            headers=headers,
-            json={"sum": user_input}
-        )
-
-        if response.status_code == 200:
-            assistant_reply = response.json().get("solution", "No solution found.")
-        else:
-            assistant_reply = f"Error: {response.status_code}, unable to solve the sum."
-
-        st.session_state.conversation_history.append({"role": "assistant", "content": assistant_reply})
-
-    except requests.exceptions.RequestException as e:
-        logging.error(f"Error occurred: {e}")
-        st.error(f"Error: {str(e)}")
+    return response.text  # Returns the generated questions as text
 
 
-def initialize_session_state():
-    """Initialize session state variables."""
-    if "history" not in st.session_state:
-        st.session_state.history = []
-    if 'conversation_history' not in st.session_state:
-        st.session_state.conversation_history = []
-
-
-def main():
+def evaluate_answers(questions, user_answers):
     """
-    Display Math Solver interface and handle the chat interface.
+    Evaluate the user's answers using the Gemini API and provide feedback.
     """
-    initialize_session_state()
+    prompt = f"Check the following answers for these math questions:\n\nQuestions:\n{questions}\n\nUser Answers:\n{user_answers}\n\nProvide correct answers and feedback."
 
-    # Insert custom CSS for glowing effect
-    st.markdown(
-        """
-        <style>
-        .cover-glow {
-            width: 100%;
-            height: auto;
-            padding: 3px;
-            box-shadow: 
-                0 0 5px #330000,
-                0 0 10px #660000,
-                0 0 15px #990000,
-                0 0 20px #CC0000,
-                0 0 25px #FF0000,
-                0 0 30px #FF3333,
-                0 0 35px #FF6666;
-            position: relative;
-            z-index: -1;
-            border-radius: 45px;
-        }
-        </style>
-        """,
-        unsafe_allow_html=True,
-    )
+    model = genai.GenerativeModel("gemini-pro")
+    response = model.generate_content(prompt)
 
-    # Sidebar for Mode Selection
-    mode = st.sidebar.radio("Select Mode:", options=["Math Chat", "Math Updates"], index=0)
-
-    if mode == "Math Chat":
-        chat_input = st.text_input("Ask me to solve a math sum:")
-        if chat_input:
-            on_chat_submit(chat_input)
-
-        # Display chat history
-        for message in st.session_state.conversation_history[-NUMBER_OF_MESSAGES_TO_DISPLAY:]:
-            role = message["role"]
-            avatar_image = "imgs/avatar_math.png" if role == "assistant" else "imgs/user.png"
-            with st.chat_message(role, avatar=avatar_image):
-                st.write(message["content"])
-
-    else:
-        st.write("Stay tuned for math-related updates.")
+    return response.text  # Return AI-generated feedback
 
 
+def generate_explanation(question):
+    """
+    Generate solution and explanation for a given question.
+    """
+    prompt = f"Provide the solution and a short explanation on how to solve the following math question: {question}"
+
+    model = genai.GenerativeModel("gemini-pro")
+    response = model.generate_content(prompt)
+
+    return response.text  # Return the explanation and solution
+
+
+def create_pdf(questions, file_name="questions.pdf"):
+    """
+    Generate a PDF containing the practice questions.
+    """
+    pdf = FPDF()
+    pdf.set_auto_page_break(auto=True, margin=15)
+    pdf.add_page()
+    pdf.set_font("Arial", size=12)
+
+    # Add Title
+    pdf.cell(200, 10, txt="Math Practice Questions", ln=True, align='C')
+    pdf.ln(10)  # Add some space between title and content
+
+    # Add questions to PDF (Only questions, not answers or feedback)
+    questions_list = questions.split("\n")
+    for i, question in enumerate(questions_list[:10]):  # Limit to first 10 questions to keep the file manageable
+        pdf.cell(200, 10, txt=f"Q{i + 1}: {question}", ln=True)
+        pdf.ln(5)  # Add some space after each question
+
+    # Output the PDF file
+    pdf.output(file_name)
+    return file_name
+
+
+def practice_test():
+    """
+    Main function to start the practice test by selecting a topic, difficulty level,
+    generating questions, getting user answers, and evaluating them.
+    """
+    st.title("Math Practice Test Generator")
+
+    # Topic, Difficulty, and Number of Questions Selection
+    topic = st.selectbox("Choose a math topic:", ["Algebra", "Geometry", "Calculus", "Trigonometry", "Probability"])
+    difficulty = st.selectbox("Choose difficulty level:", ["Easy", "Medium", "Hard"])
+    num_questions = st.number_input("Enter the number of questions:", min_value=1, max_value=20, value=5)
+
+    # Check if questions are already generated
+    if "questions" not in st.session_state:
+        st.session_state["questions"] = ""
+        st.session_state["answers"] = []
+
+    if st.button("Generate Practice Questions"):
+        st.write("Generating questions...")
+        questions = generate_practice_questions(topic, difficulty, num_questions)
+
+        # Store questions in session state
+        st.session_state["questions"] = questions
+        st.session_state["answers"] = [None] * num_questions  # Initialize answer fields
+
+        st.write(f"### Practice Questions for {topic} ({difficulty}):")
+        st.write(questions)
+
+    # Displaying the generated questions and collecting answers
+    if st.session_state["questions"]:
+        question_list = st.session_state["questions"].split("\n")  # Assuming each question is on a new line
+        for i, question in enumerate(question_list[:num_questions]):  # Display only the specified number of questions
+            st.write(f"**Q{i + 1}:** {question}")  # Display the question
+            st.session_state["answers"][i] = st.text_input(f"Your answer for Question {i + 1}:",
+                                                           value=st.session_state["answers"][
+                                                               i])  # Answer field below the question
+
+        if st.button("Submit Answers"):
+            st.write("Submitting answers for evaluation...")
+            feedback = evaluate_answers(st.session_state["questions"], st.session_state["answers"])
+            st.write("### Feedback & Evaluation:")
+
+            # Format the feedback in a detailed manner
+            feedback_lines = feedback.split("\n")  # Split feedback into lines
+            question_list = st.session_state["questions"].split("\n")
+
+            for i in range(min(len(question_list), num_questions)):
+                # Get the correct answer, user answer, and feedback
+                correct_answer = feedback_lines[i * 3] if i * 3 < len(feedback_lines) else "N/A"
+                user_answer = st.session_state["answers"][i] if i < len(st.session_state["answers"]) else "N/A"
+                is_correct = "Correct" if correct_answer == user_answer else "Incorrect"
+
+                st.write(f"**Q{i + 1}:** {question_list[i]}")
+                st.write(f"**Correct Answer:** {correct_answer}")
+                st.write(f"**Your Answer:** {user_answer}")
+                st.write(f"**Result:** {is_correct}")
+
+                # Add the Expander for Solution and Explanation
+                with st.expander(f"Click to view the solution and explanation for Q{i + 1}"):
+                    solution = generate_explanation(question_list[i])
+                    st.write(solution)
+                st.write("---")
+
+        # Button to download the questions as a PDF
+        if st.button("Download Questions as PDF"):
+            file_name = create_pdf(st.session_state["questions"])
+            with open(file_name, "rb") as pdf_file:
+                st.download_button("Download PDF", pdf_file, file_name=file_name)
+
+
+# Run the Streamlit app
 if __name__ == "__main__":
-    main()
+    practice_test()

@@ -6,6 +6,7 @@ from PIL import Image
 
 # Function for creating the header
 def header():
+
     st.image('mathlab.png')
 
 
@@ -35,7 +36,7 @@ def main_dashboard():
             }
             .header {
                 text-align: center;
-                font-size: 50px;
+                font-size: 35px;
                 font-weight: bold;
                 padding: 2px;
                 color: #4CAF50;
@@ -55,12 +56,16 @@ def main_dashboard():
     st.title("🏠 Welcome to EduCare")
     st.subheader("📘 Your go-to platform for education and resources.")
     st.markdown("""
-    EduCare is an online educational platform that brings together cutting-edge tech and learning resources.
-    - 🎯 Interactive Courses with real-world applications.
-    - 🧑‍🏫 Expert Instructors from top universities and industries.
-    - 📊 Data-driven Learning Paths to track progress.
-    - 🌍 Community Support & Webinars to stay updated.
-    - 🔥 Career Guidance and job interview preparation.
+        EduCare is an online educational platform that brings together cutting-edge tech and learning resources.
+        - 🎯 Interactive Courses with real-world applications.
+        - 🧑‍🏫 Expert Instructors from top universities and industries.
+        - 📊 Data-driven Learning Paths to track progress.
+        - 🌍 Community Support & Webinars to stay updated.
+        - 🔥 Career Guidance and job interview preparation.
+        - 🚀 Hands-on Projects to build your portfolio.
+        - 🧑‍💻 Coding Challenges to sharpen your skills.
+        - 🎓 Certification upon completion to enhance your resume.
+        - 🕒 Flexible Scheduling to learn at your own pace.
     """)
 
 
@@ -117,7 +122,7 @@ def contact_us():
     chat_input = st.text_input("Type your message...")
     if st.button("Send"):
         st.markdown(f"**You:** {chat_input}")
-        st.markdown("**Support:** We will get back to you soon! 😊")
+        st.markdown("**Support:** We’ll respond to you shortly after our lunch break. 😊")
 
 
 def course_list():
@@ -135,11 +140,11 @@ def source_code_tech():
     - **Python** 🐍: Core language for backend and ML tasks.
     - **Streamlit** 🚀: Fast and interactive UI development.
     - **MongoDB** 📂: NoSQL database for storing user data.
-    - **Docker** 🐳: Containerized deployments for scalability.
+    - **Ai Agent** 🐳: Containerized deployments for scalability.
     - **FastAPI** ⚡: Modern API framework for fast performance.
     - **TensorFlow & PyTorch** 🧠: Machine learning model integrations.
     - **AWS & GCP** ☁️: Cloud hosting and storage solutions.
-    - **PostgreSQL** 🗃️: Reliable relational database support.
+    - **Manim** 🗃️: Reliable relational animation creator.
     - **Bootstrap & Tailwind CSS** 🎨: UI and responsive design frameworks.
     """)
 

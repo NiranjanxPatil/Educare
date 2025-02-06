@@ -12,13 +12,13 @@ st.image('airsolve.png')
 # Collapsible Instructions Section
 with st.expander("Instructions"):
     st.write("""
-    1. **Run the program** by checking the 'Run' checkbox.
-    2. **Draw on the screen** using your hand gestures to create math problems.
-    3. When the gesture is detected, it will be sent to the AI to solve.
-    4. The **AI's answer** will appear in the chat history.
-    5. **Clear the canvas** by using the 'Fist' gesture (closed fist).
-    6. Upload images for solving math problems, and the AI will provide answers.
-    """)
+       1. **Run the program** by checking the 'Run' checkbox.
+       2. **Draw on the screen** using your hand gestures to create math problems.
+       3. When the gesture is detected, it will be sent to the AI by showing first 4 fingers. 
+       4. The **AI's answer** will appear in the chat history.
+       5. **Clear the canvas** by using the 'Thumb' gesture (fist closed thumb open). 
+       6. Upload images for solving math problems, and the AI will provide answers.
+       """)
 
 col1, col2 = st.columns([3, 2])
 with col1:
@@ -26,7 +26,7 @@ with col1:
     FRAME_WINDOW = st.empty()
 
 with col2:
-    st.title("Answer")
+    st.title("Answer of Questions   ")
     # Create a placeholder to store the chat-like responses
     chat_history = st.empty()
 
