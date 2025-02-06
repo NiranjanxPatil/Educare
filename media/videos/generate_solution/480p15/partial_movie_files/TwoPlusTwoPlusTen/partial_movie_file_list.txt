@@ -1,9 +1,0 @@
-# This file is used internally by FFMPEG.
-file 'file:C:/projects/temppycharm/streamlit/media/videos/generate_solution/480p15/partial_movie_files/TwoPlusTwoPlusTen/1185818338_1537363685_2560225593.mp4'
-file 'file:C:/projects/temppycharm/streamlit/media/videos/generate_solution/480p15/partial_movie_files/TwoPlusTwoPlusTen/624642324_3089346741_129632044.mp4'
-file 'file:C:/projects/temppycharm/streamlit/media/videos/generate_solution/480p15/partial_movie_files/TwoPlusTwoPlusTen/624642324_2363952263_2489981618.mp4'
-file 'file:C:/projects/temppycharm/streamlit/media/videos/generate_solution/480p15/partial_movie_files/TwoPlusTwoPlusTen/624642324_3394500337_3449392770.mp4'
-file 'file:C:/projects/temppycharm/streamlit/media/videos/generate_solution/480p15/partial_movie_files/TwoPlusTwoPlusTen/624642324_2739092317_2903075169.mp4'
-file 'file:C:/projects/temppycharm/streamlit/media/videos/generate_solution/480p15/partial_movie_files/TwoPlusTwoPlusTen/624642324_3017452791_2065278312.mp4'
-file 'file:C:/projects/temppycharm/streamlit/media/videos/generate_solution/480p15/partial_movie_files/TwoPlusTwoPlusTen/624642324_3785605568_179142044.mp4'
-file 'file:C:/projects/temppycharm/streamlit/media/videos/generate_solution/480p15/partial_movie_files/TwoPlusTwoPlusTen/624642324_2844360058_3733233627.mp4'

@@ -1,4 +1,0 @@
-# This file is used internally by FFMPEG.
-file 'file:C:/projects/temppycharm/streamlit/media/videos/generate_solution/480p15/partial_movie_files/ThreeDCubeScene/238433677_3658491163_223132457.mp4'
-file 'file:C:/projects/temppycharm/streamlit/media/videos/generate_solution/480p15/partial_movie_files/ThreeDCubeScene/432527821_1365821926_2250132931.mp4'
-file 'file:C:/projects/temppycharm/streamlit/media/videos/generate_solution/480p15/partial_movie_files/ThreeDCubeScene/432527821_3515533520_2275682036.mp4'

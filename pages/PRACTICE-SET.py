@@ -1,8 +1,9 @@
 import streamlit as st
 import google.generativeai as genai
 from fpdf import FPDF
+import requests  # For calling the second API for explanation
 
-# Set up Gemini API Key
+# Set up the first Gemini API Key for practice questions
 genai.configure(api_key="AIzaSyCjjFyXDIbnjOdOSLuj0W3trl3eCXdkQ6g")
 
 
@@ -20,11 +21,18 @@ def evaluate_answers(questions, user_answers):
     return response.text
 
 
-def generate_explanation(question):
-    prompt = f"Provide a step-by-step solution and explanation for the following math question: {question}"
-    model = genai.GenerativeModel("gemini-pro")
-    response = model.generate_content(prompt)
-    return response.text
+def get_explanation_from_new_api(question):
+    url = "https://api.newapi.com/explanation"  # Replace with the actual URL
+    headers = {
+        "Authorization": "Bearer AIzaSyByz2fCoMLCiLP1T8e2UFlnNG96s7RlzSE"
+    }
+    payload = {"question": question}
+    response = requests.post(url, json=payload, headers=headers)
+
+    if response.status_code == 200:
+        return response.json().get("explanation", "Explanation not found.")
+    else:
+        return "Failed to fetch explanation."
 
 
 def create_pdf(questions, file_name="questions.pdf"):
@@ -82,9 +90,11 @@ def practice_test():
                 st.write(f"**Result:** {is_correct}")
 
                 with st.expander(f"Click to view the solution and explanation for Q{i + 1}"):
+
+                    # When clicking the "Explain" button, fetch explanation from new API
                     if st.button(f"Generate Explanation for Q{i + 1}", key=f"explain_{i}"):
-                        solution = generate_explanation(question)
-                        st.write(solution)
+                        explanation = get_explanation_from_new_api(question)
+                        st.write(explanation)
 
                 st.write("---")
 
