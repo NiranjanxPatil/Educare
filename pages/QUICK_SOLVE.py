@@ -8,7 +8,6 @@ genai.configure(api_key="AIzaSyAv_Hozwv3jAycftamoGYb1Gc0rMl5_j4c")
 model = genai.GenerativeModel("gemini-1.5-flash")
 
 # Streamlit UI setup
-
 st.set_page_config(page_title="Math Solution and Video Generator", layout="wide")
 st.title("📚 Math Solution and Video Generator")
 st.write("Enter a math equation, solve it step by step, and generate a video explanation!")
@@ -27,12 +26,10 @@ for chat in st.session_state["chat_history"]:
 st.subheader("Math Solver")
 user_input = st.text_input("Enter a math equation or problem here:")
 
-
 def clean_manim_code(raw_code):
     """Removes unnecessary prefix/suffix and formats the Manim script correctly."""
     cleaned_code = raw_code.strip().replace("```python", "").replace("```", "").strip()
     return cleaned_code
-
 
 def handle_error_and_retry(error_message, manim_code, attempt_count):
     """Send the error back to the API to fix and retry."""
@@ -51,7 +48,6 @@ def handle_error_and_retry(error_message, manim_code, attempt_count):
         script_file.write(corrected_code)
 
     return corrected_code, attempt_count + 1
-
 
 # Solve Button
 if st.button("Solve"):
@@ -91,7 +87,7 @@ if st.button("Generate Video"):
             with open("generate_solution.py", "w") as script_file:
                 script_file.write(manim_code)
 
-            retry_limit = 2
+            retry_limit = 3  # Increased retry attempts from 2 to 3
             attempts = 0
             progress_bar = st.progress(0)
 
@@ -122,6 +118,6 @@ if st.button("Generate Video"):
                 progress_bar.progress(int((attempts + 1) * 50 / retry_limit))
 
             if attempts == retry_limit:
-                st.error("Failed to generate video after 2 attempts.")
+                st.error("Failed to generate video after 3 attempts.")
         except Exception as e:
             st.error(f"Error generating video: {e}")

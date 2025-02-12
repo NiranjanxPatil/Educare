@@ -21,8 +21,8 @@ def image_to_base64(image):
 # Sidebar function with icons
 def sidebar():
     st.sidebar.title("📌 Navigation")
-    st.sidebar.markdown("Welcome to EduCare")
-    st.sidebar.image(r"C:\\projects\\temppycharm\\streamlit\\imgs\\logo.png", width=50)
+    st.sidebar.markdown("Welcome to Math-Lab")
+    st.sidebar.image(r"C:\\projects\\temppycharm\\streamlit\\mathlab.png", width=200)
     options = ["🏠 Home", "📞 Contact Us", "ℹ️ About EduCare", "📚 Course List", "💻 Source Code & Tech"]
     selection = st.sidebar.radio("Select Option", options)
     return selection
@@ -53,7 +53,7 @@ def main_dashboard():
         '<div class="header">  MathLab Dashboard</div>'.format(
             image_to_base64(image)),
         unsafe_allow_html=True)
-    st.title("🏠 Welcome to EduCare")
+    st.title("🏠 Welcome to Math-lab")
     st.subheader("📘 Your go-to platform for education and resources.")
     st.markdown("""
         EduCare is an online educational platform that brings together cutting-edge tech and learning resources.
@@ -139,7 +139,6 @@ def source_code_tech():
     ### Technologies Used:
     - **Python** 🐍: Core language for backend and ML tasks.
     - **Streamlit** 🚀: Fast and interactive UI development.
-    - **MongoDB** 📂: NoSQL database for storing user data.
     - **Ai Agent** 🐳: Containerized deployments for scalability.
     - **FastAPI** ⚡: Modern API framework for fast performance.
     - **TensorFlow & PyTorch** 🧠: Machine learning model integrations.

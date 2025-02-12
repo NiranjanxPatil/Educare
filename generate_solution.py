@@ -1,39 +1,50 @@
 from manim import *
 
-class TwoPlusTwoPlusTen(Scene):
+class CylinderVolume(Scene):
     def construct(self):
-        background = Rectangle(width=14, height=8, fill_color=DARK_GREY, fill_opacity=1).to_edge(LEFT)
-        self.add(background)
+        self.camera.background_color = DARK_GRAY
 
-        two_plus_two = MathTex("2 + 2").set_color(YELLOW).scale(2).shift(2*UP + 2*LEFT)
-        self.play(Write(two_plus_two))
+        title = Tex("Cylinder Volume Calculation", color=YELLOW).scale(1.5)
+        self.play(Write(title))
+        self.wait(1)
+        self.play(FadeOut(title))
 
-        plus_ten = MathTex("+ 10").set_color(BLUE).scale(2).next_to(two_plus_two, RIGHT)
-        self.play(Write(plus_ten))
-
-        equals = MathTex("=").set_color(GREEN).scale(2).next_to(plus_ten, RIGHT)
-        self.play(Write(equals))
-
-        four = MathTex("4").set_color(YELLOW).scale(2).next_to(two_plus_two, RIGHT)
-        self.play(TransformMatchingTex(two_plus_two, four))
-        self.play(FadeOut(plus_ten))
-        self.play(four.animate.next_to(equals,LEFT))
-
-
-        four_plus_ten = MathTex("4 + 10").set_color(ORANGE).scale(2).next_to(equals,LEFT)
-        self.play(TransformMatchingTex(four, four_plus_ten[0]))
-        self.play(Write(four_plus_ten[1:]))
-
-        fourteen = MathTex("14").set_color(PINK).scale(3).next_to(four_plus_ten,RIGHT)
-        self.play(TransformMatchingTex(four_plus_ten, fourteen), run_time=1)
-
-
-        circle = Circle(radius=1, color=PURPLE, fill_opacity=0.5).move_to(fourteen)
-        self.play(Create(circle), run_time=0.5)
-        self.play(circle.animate.scale(2), run_time=0.5)
-        self.play(FadeOut(circle))
+        r_text = MathTex(r"r = 2").set_color(BLUE).scale(1.2)
+        h_text = MathTex(r"h = 8").set_color(GREEN).scale(1.2)
+        self.play(Write(r_text), Write(h_text))
+        r_text.to_edge(UL)
+        h_text.next_to(r_text, DOWN)
         self.wait(1)
 
-        final_answer = Tex("Therefore, 2 + 2 + 10 = 14").set_color(WHITE).scale(1.5).to_edge(DOWN)
-        self.play(Write(final_answer))
+        cylinder = Cylinder(radius=2, height=8, fill_opacity=0.7, fill_color=BLUE_C)
+        self.play(Create(cylinder))
+        self.wait(1)
+
+        formula = MathTex(r"V = \pi r^2 h").set_color(YELLOW).scale(1.2)
+        formula.next_to(h_text, DOWN, buff=1)
+        self.play(Write(formula))
+        self.wait(1)
+
+        substitution = MathTex(r"V = \pi (2)^2 (8)").set_color(GOLD).scale(1.2)
+        substitution.next_to(formula, DOWN, buff=1)
+        self.play(TransformMatchingTex(formula.copy(), substitution))
+        self.wait(1)
+
+        calculation = MathTex(r"V = 32\pi").set_color(PURPLE).scale(1.2)
+        calculation.next_to(substitution, DOWN, buff=1)
+        self.play(TransformMatchingTex(substitution.copy(), calculation))
+        self.wait(1)
+
+
+        approx = MathTex(r"V \approx 100.53").set_color(PINK).scale(1.2)
+        approx.next_to(calculation, DOWN, buff=1)
+        self.play(Write(approx))
         self.wait(2)
+
+        self.play(FadeOut(r_text), FadeOut(h_text), FadeOut(formula), FadeOut(substitution), FadeOut(calculation), FadeOut(approx), FadeOut(cylinder))
+        self.wait(1)
+
+
+        final_answer = MathTex("V \\approx 100.53 \\text{ cubic units}", color=WHITE).scale(1.5)
+        self.play(Write(final_answer))
+        self.wait(3)

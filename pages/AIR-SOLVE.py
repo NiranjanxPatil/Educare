@@ -26,11 +26,11 @@ with col1:
     FRAME_WINDOW = st.empty()
 
 with col2:
-    st.title("Answer of Questions   ")
+    st.title(" Solutions ")
     # Create a placeholder to store the chat-like responses
     chat_history = st.empty()
 
-genai.configure(api_key="AIzaSyDsDy6Ynhc2SDmCcYKgMPWB4A9u28ee9eg")
+genai.configure(api_key="AIzaSyCYI9MmaDEv1G2QHnEfAznNwpf-FiXMofQ")
 model = genai.GenerativeModel('gemini-1.5-flash')
 
 # Initialize the webcam to capture video
