@@ -1,201 +1,110 @@
-import streamlit as st
-import matplotlib.pyplot as plt
+import torch
+import torch.nn as nn
+import torch.optim as optim
+import random
 import numpy as np
-from PIL import Image
+import pygame
+from collections import deque
 
+# Simple DQN model
+class DQN(nn.Module):
+    def __init__(self):
+        super(DQN, self).__init__()
+        # Updated input size to match the new screen resolution (800x800)
+        self.fc1 = nn.Linear(800 * 800 * 3, 128)
+        self.fc2 = nn.Linear(128, 3)
 
-# Function for creating the header
-def header():
+    def forward(self, x):
+        x = x.view(x.size(0), -1)  # Flatten input
+        x = torch.relu(self.fc1(x))
+        x = self.fc2(x)
+        return x
 
-    st.image('mathlab.png')
+# Pong environment (simplified)
+class PongGame:
+    def __init__(self):
+        self.width = 800  # Updated size
+        self.height = 800  # Updated size
+        self.screen = pygame.display.set_mode((self.width, self.height))
+        self.reset()
 
+    def reset(self):
+        self.score = 0
+        self.done = False
+        return np.random.randn(self.height, self.width, 3)
 
-def image_to_base64(image):
-    import base64
-    from io import BytesIO
-    buffered = BytesIO()
-    image.save(buffered, format="PNG")
-    return base64.b64encode(buffered.getvalue()).decode()
+    def step(self, action):
+        next_state = np.random.randn(self.height, self.width, 3)
+        reward = random.random()
+        self.done = random.random() > 0.95
+        return next_state, reward, self.done
 
+    def render(self):
+        pygame.display.update()
 
-# Sidebar function with icons
-def sidebar():
-    st.sidebar.title("📌 Navigation")
-    st.sidebar.markdown("Welcome to Math-Lab")
-    st.sidebar.image(r"C:\\projects\\temppycharm\\streamlit\\mathlab.png", width=200)
-    options = ["🏠 Home", "📞 Contact Us", "ℹ️ About EduCare", "📚 Course List", "💻 Source Code & Tech"]
-    selection = st.sidebar.radio("Select Option", options)
-    return selection
+# DQN Training function
+def train_dqn():
+    env = PongGame()
+    model = DQN()
+    optimizer = optim.Adam(model.parameters(), lr=0.001)
+    criterion = nn.MSELoss()
 
+    memory = deque(maxlen=10000)
+    epsilon = 0.1
+    gamma = 0.99
+    batch_size = 32
+    target_update = 10
+    num_episodes = 2000
 
-def main_dashboard():
-    st.markdown("""
-        <style>
-            body {
-                background-color: white;
-            }
-            .header {
-                text-align: center;
-                font-size: 35px;
-                font-weight: bold;
-                padding: 2px;
-                color: #4CAF50;
-                background-color: #ADD8E6;
-                border-radius: 50px;
-            }
-        </style>
-        """, unsafe_allow_html=True)
+    for episode in range(num_episodes):
+        state = np.array(env.reset())
+        state = torch.FloatTensor(state).unsqueeze(0)  # Add batch dimension
+        done = False
+        total_reward = 0
 
-    image_path = r"C:\\projects\\temppycharm\\streamlit\\imgs\\logo.png"
-    image = Image.open(image_path)
+        while not done:
+            if random.random() < epsilon:
+                action = random.choice([0, 1, 2])
+            else:
+                with torch.no_grad():
+                    q_values = model(state)
+                action = torch.argmax(q_values).item()
 
-    st.markdown(
-        '<div class="header">  MathLab Dashboard</div>'.format(
-            image_to_base64(image)),
-        unsafe_allow_html=True)
-    st.title("🏠 Welcome to Math-lab")
-    st.subheader("📘 Your go-to platform for education and resources.")
-    st.markdown("""
-        EduCare is an online educational platform that brings together cutting-edge tech and learning resources.
-        - 🎯 Interactive Courses with real-world applications.
-        - 🧑‍🏫 Expert Instructors from top universities and industries.
-        - 📊 Data-driven Learning Paths to track progress.
-        - 🌍 Community Support & Webinars to stay updated.
-        - 🔥 Career Guidance and job interview preparation.
-        - 🚀 Hands-on Projects to build your portfolio.
-        - 🧑‍💻 Coding Challenges to sharpen your skills.
-        - 🎓 Certification upon completion to enhance your resume.
-        - 🕒 Flexible Scheduling to learn at your own pace.
-    """)
+            next_state, reward, done = env.step(action)
+            next_state_tensor = torch.FloatTensor(next_state).unsqueeze(0)
 
+            memory.append((state, action, reward, next_state_tensor, done))
+            state = next_state_tensor
+            total_reward += reward
 
-def combined_info():
-    st.title("ℹ️ About EduCare & Testimonials")
-    st.markdown("""
-    **Our Mission**: To create a platform that bridges the gap between traditional education and modern learning.
-    - 🏆 Award-winning educational platform trusted by thousands.
-    - 🤖 AI-powered Personalized Learning Experiences.
-    - 📚 Course materials from reputed universities & industry experts.
-    - 🌟 Recognized by major tech firms for skill development.
-    - 🎓 Partnerships with top institutions for certifications.
-    - 🚀 Hands-on projects to enhance learning.
-    - 📈 Career-oriented roadmap to help students excel.
-    """)
+            if len(memory) > batch_size:
+                batch = random.sample(memory, batch_size)
+                states, actions, rewards, next_states, dones = zip(*batch)
 
-    st.subheader("🌟 Testimonials")
-    testimonials = [
-        {"name": "Alice Johnson", "feedback": "EduCare transformed my career! The AI-driven courses are outstanding."},
-        {"name": "Mark Williams",
-         "feedback": "The best platform for data science and AI learning. Highly recommended!"},
-        {"name": "Sophia Patel", "feedback": "Loved the interactive lessons and community support."},
-    ]
+                states = torch.stack(states)
+                actions = torch.tensor(actions).unsqueeze(1)
+                rewards = torch.tensor(rewards).unsqueeze(1)
+                next_states = torch.stack(next_states)
+                dones = torch.tensor(dones).unsqueeze(1)
 
-    for t in testimonials:
-        st.markdown(f"**{t['name']}**: \"{t['feedback']}\"")
+                current_q_values = model(states).gather(1, actions)
+                next_q_values = model(next_states).max(1)[0].unsqueeze(1)
 
-    st.subheader("📅 Webinars & Events")
-    st.markdown("""
-    Stay updated with our latest events and webinars:
-    - **AI & ML Bootcamp** - January 20, 2025
-    - **Data Science Career Talk** - February 5, 2025
-    - **Cloud Computing Masterclass** - March 10, 2025
-    """)
+                target_q_values = rewards + gamma * next_q_values * (1 - dones.float())
 
+                loss = criterion(current_q_values, target_q_values)
 
-def contact_us():
-    st.title("📞 Contact Us")
-    st.markdown("Have any questions? Reach out to us.")
+                optimizer.zero_grad()
+                loss.backward()
+                optimizer.step()
 
-    with st.form(key='contact_form'):
-        name = st.text_input("👤 Name")
-        email = st.text_input("📧 Email")
-        message = st.text_area("💬 Your Message")
-        submit_button = st.form_submit_button(label="Submit")
+        if episode % target_update == 0:
+            print(f'Episode {episode}, Total Reward: {total_reward}')
+            env.render()
 
-    if submit_button:
-        st.success(f"Thank you {name}! Your message has been sent.")
-
-    # Live Chat Section
-    st.subheader("💬 Live Chat Support")
-    st.markdown("Need quick help? Chat with our support team below.")
-
-    chat_input = st.text_input("Type your message...")
-    if st.button("Send"):
-        st.markdown(f"**You:** {chat_input}")
-        st.markdown("**Support:** We’ll respond to you shortly after our lunch break. 😊")
-
-
-def course_list():
-    st.title("📚 Our Courses")
-    st.markdown("""
-    - **Web Development**: Build websites and web apps from scratch.
-    - **Data Science**: Learn the fundamentals of data analytics and machine learning.
-    """)
-
-
-def source_code_tech():
-    st.title("💻 Source Code & Tech")
-    st.markdown("""
-    ### Technologies Used:
-    - **Python** 🐍: Core language for backend and ML tasks.
-    - **Streamlit** 🚀: Fast and interactive UI development.
-    - **Ai Agent** 🐳: Containerized deployments for scalability.
-    - **FastAPI** ⚡: Modern API framework for fast performance.
-    - **TensorFlow & PyTorch** 🧠: Machine learning model integrations.
-    - **AWS & GCP** ☁️: Cloud hosting and storage solutions.
-    - **Manim** 🗃️: Reliable relational animation creator.
-    - **Bootstrap & Tailwind CSS** 🎨: UI and responsive design frameworks.
-    """)
-
-
-def course_stats():
-    st.title("📊 Course Enrollment Statistics")
-    courses = ["Web Dev", "Data Science", "AI & ML", "Cloud Computing"]
-    enrollments = [150, 200, 175, 120]
-    fig, ax = plt.subplots()
-    ax.bar(courses, enrollments, color="#2196F3")
-    ax.set_xlabel("Courses")
-    ax.set_ylabel("Enrollments")
-    ax.set_title("Number of Enrollments per Course")
-    st.pyplot(fig)
-
-
-def footer():
-    st.markdown("""
-    <style>
-        .footer {
-            text-align: center;
-            font-size: 12px;
-            padding: 10px;
-            color: white;
-            background-color: #4CAF50;
-            border-radius: 10px;
-        }
-    </style>
-    """, unsafe_allow_html=True)
-    st.markdown('<div class="footer">All Rights Reserved - EduCare</div>', unsafe_allow_html=True)
-
-
-def main():
-    header()
-    option = sidebar()
-
-    if option == "🏠 Home":
-        main_dashboard()
-    elif option == "📞 Contact Us":
-        contact_us()
-    elif option == "ℹ️ About EduCare":
-        combined_info()
-    elif option == "📚 Course List":
-        course_list()
-    elif option == "💻 Source Code & Tech":
-        source_code_tech()
-
-    if option == "📚 Course List":
-        course_stats()
-
-    footer()
-
+        if episode % 500 == 0:
+            torch.save(model.state_dict(), f"dqn_pong_{episode}.pth")
 
 if __name__ == "__main__":
-    main()
+    pygame.init()
+    train_dqn()
